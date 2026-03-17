@@ -1,0 +1,586 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+  xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+  xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+  xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:compression="http://www.mulesoft.org/schema/mule/compression"
+  xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+  xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+  xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/mule/compression/current/mule-compression.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+  <http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config"
+    doc:id="7f8e2f1a-4710-449d-914c-3e6214a34392">
+    <http:listener-connection host="0.0.0.0" port="8087"/>
+  </http:listener-config>
+  <http:listener-config name="HTTP_Listener_config1" doc:name="HTTP Listener config"
+    doc:id="288272b0-daac-4186-8be9-6d8d1d914db9">
+    <http:listener-connection host="0.0.0.0" port="8082"/>
+  </http:listener-config>
+  
+  <validation:config name="Validation_Config" doc:name="Validation Config"
+    doc:id="a471080a-d30d-4f6b-bc5b-41c35ef58a2b"/>
+	<file:config name="File_Config" doc:name="File Config" doc:id="c353e91f-9f80-4910-84b0-604b56ff2bdd" />
+	<flow name="for-each-example" doc:id="a96a5089-1983-4620-bc50-116c8ccb9c70">
+    <http:listener doc:name="Copy_of_Copy_of_Listener1" doc:id="482bfa56-417d-410b-bb60-e5234b62be4a"
+      config-ref="HTTP_Listener_config1" path="/mule48"/>
+    <set-variable value="#[10]" doc:name="counter to 10" doc:id="29943743-2a4a-4b53-82b7-22e537181163"
+      variableName="counter"/>
+    <set-payload value="#[[1,2,3]]" doc:name="to [1,2,3]" doc:id="933f5f8f-3766-4be0-bd9c-0100fef7e213"/>
+    <foreach doc:name="Copy_of_For Each" doc:id="94fb2c4a-a61c-41fc-93fe-6a6f12b02b07">
+      <set-payload value="#[[1,2,3,4,5]]" doc:name="to [1,2,3,4,5]"
+        doc:id="ff0c9b7a-1def-44cd-a89b-9a91f44ec5be"/>
+      <set-variable value="#[2]" doc:name="counter to 2" doc:id="84c690ab-53d1-47b9-8b60-7f30df7a4213"
+        variableName="counter"/>
+      <logger level="INFO" doc:name="Logger" doc:id="9fae5655-83f2-41f1-8258-15831ec40f56" message="#[payload]"/>
+    </foreach>
+    <logger level="INFO" doc:name="log payload" doc:id="f44626b7-72d2-410a-af34-2e5918245f2c"
+      message="#[payload]"/>
+    <logger level="INFO" doc:name="log counter" doc:id="90e19cca-6ec5-4e68-9be8-d5a04ffae84e"
+      message="#[vars.counter]"/>
+  </flow>
+  <flow name="batch-example" doc:id="78ce7f9c-9611-4964-8c87-beb2a181b5c6">
+    <http:listener doc:name="Copy_of_Listener1" doc:id="e095f972-09f9-4812-8a47-8a56b5332f07"
+      config-ref="HTTP_Listener_config1" path="/mule45"/>
+    <set-variable value="#[1]" doc:name="counter to 1" doc:id="4bf577a3-3c59-47a5-87cc-f7dad35be54b"
+      variableName="counter"/>
+    <set-payload value="#[[1,2,3]]" doc:name="to [1,2,3]" doc:id="7353beb7-f690-4a1b-8639-c9ab1349e710"/>
+    <batch:job jobName="sampleBatch_Job" doc:id="815adfe0-aa46-44ed-93c9-4406384a3962">
+      <batch:process-records>
+        <batch:step name="Batch_Step1" doc:id="b890a486-5900-4802-b1da-83d682f929df">
+          <set-variable value="#[payload]" doc:name="batchStepPayload to payload"
+            doc:id="3385be05-ff08-470d-9cb2-27b3393dd57a" variableName="batchStepPayload"/>
+        </batch:step>
+        <batch:step name="Batch_Step2" doc:id="6223d83f-136c-4f7a-9ce9-f077c8275992">
+          <set-variable value="#[vars.counter + 10]" doc:name="increment counter + 10"
+            doc:id="42d1746b-0c78-48b3-9e6b-54ea79ec6c15" variableName="counter"/>
+          <set-variable value="#[vars.batchStepPayload + 10]" doc:name="batchStepPayload + 10"
+            doc:id="8cb5a0b6-d1e5-4c15-8d28-d96906942945" variableName="batchStepPayload"/>
+          <set-payload value="#[vars.batchStepPayload]" doc:name="to var batchStepPayload"
+            doc:id="45d0e7e0-f8bf-4160-a4ee-a04f9ec37297"/>
+          <logger level="INFO" doc:name="Log payload" doc:id="a5cacedc-2fbc-4c8b-ba8e-f0c2bee1f790"
+            message='#["payload: " ++ payload]'/>
+        </batch:step>
+      </batch:process-records>
+      <batch:on-complete>
+        <logger level="INFO" doc:name="Log batchStepPayload" doc:id="5a727f95-14d7-4b3c-976e-bd5807f8119d"
+          message='#[vars.batchStepPayload]'/>
+        <logger level="INFO" doc:name="Log counter" doc:id="c7cf9ce6-9346-4c5b-b9e0-c9667f7f2ff0"
+          message='#["counter: " ++ vars.counter]'/>
+      </batch:on-complete>
+    </batch:job>
+  </flow>
+  <flow name="sampleFlow8" doc:id="ba922d39-d818-4702-8ce9-d47146f84bef">
+    <http:listener doc:name="Listener7" doc:id="18f8b8ad-9db7-48e2-83c7-58e09bba2747"
+      config-ref="HTTP_Listener_config1" path="/mule47"/>
+    <set-payload value="#[[1,2,3,4,5,6,7,8,9,10,11]]" doc:name="to [1,2,3,4]"
+      doc:id="f6d9d496-d199-4709-a0d1-d87079ccd7ba"/>
+    <batch:job jobName="sampleBatch_Job1" doc:id="0231b1c5-5558-4c67-8f83-0933faf33bff">
+      <batch:process-records>
+        <batch:step name="Batch_Step" doc:id="8ef5999b-8753-491e-84ba-4b28644578cf"
+          acceptExpression="#[(payload mod 2) != 0]">
+          <ee:transform doc:name="Divide by 3" doc:id="e296741e-d6e2-469c-a926-0a8bffb208b1">
+            <ee:message>
+              <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+	payload / 3]]></ee:set-payload>
+            </ee:message>
+          </ee:transform>
+          <batch:aggregator doc:name="Batch Aggregator" doc:id="d802cb7a-a7c9-423f-ba3a-38036bfc379d"
+            size="3">
+            <logger level="INFO" doc:name="Logger" doc:id="8015edce-20e1-40d3-b6ab-5ff25cee1b69"
+              message="#[payload]"/>
+          </batch:aggregator>
+        </batch:step>
+      </batch:process-records>
+    </batch:job>
+  </flow>
+  <flow name="sampleFlow17" doc:id="1f8cfd0f-fecc-4c70-93ac-795800dd4414">
+    <http:listener doc:name="Copy_of_Listener7" doc:id="b2607b41-2fcb-499a-80a4-bba2e2b25874"
+      config-ref="HTTP_Listener_config1" path="/mule55"/>
+    <set-payload value="#[[1,2,3]]" doc:name="[1,2,3]" doc:id="7769013a-52a1-49bb-8926-25be1092da26"/>
+    <batch:job jobName="sampleBatch_Job2" doc:id="5e6c94a7-63d9-4058-b051-6c437f971723">
+      <batch:process-records>
+        <batch:step name="Batch_Step1" doc:id="c6ec7464-216c-4b94-bcb8-e731cc19d14b">
+          <set-payload value='#["StepOne" ++ payload]' doc:name='"StepOne" ++ payload'
+            doc:id="b0f7a1c8-6413-45cf-b607-db440349ffe0"/>
+        </batch:step>
+        <batch:step name="Batch_Step2" doc:id="caee9150-1d1e-4b92-b07e-ed3470ede2c6">
+          <set-payload value='#["StepTwo" ++ payload]' doc:name='"StepTwo" ++ payload'
+            doc:id="8e0a071e-8d06-4254-87e4-35be7fd8cc60"/>
+        </batch:step>
+      </batch:process-records>
+      <batch:on-complete>
+        <logger level="INFO" doc:name="Logger" doc:id="06c40201-0ad5-4b46-8643-bce716e82ec1" message='#["VISH"]'/>
+        <ee:transform doc:name="Transform Message" doc:id="1c2e0ec9-7bfb-4bf4-b961-f1d8d2a5cb73">
+          <ee:message>
+            <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+          </ee:message>
+        </ee:transform>
+        <logger level="INFO" doc:name="Logger" doc:id="a0353794-196f-4cd7-a2bc-9af43e713f63" message="#[payload]"/>
+      </batch:on-complete>
+    </batch:job>
+  </flow>
+  <flow name="sampleFlow7" doc:id="a5bcd6f2-0b17-45b7-844a-10c3478c9a15">
+    <http:listener doc:name="Copy_of_Copy_of_Listener1" doc:id="9dfb394e-40dd-4ce8-bc4b-805bf5ed8616"
+      config-ref="HTTP_Listener_config1" path="/mule46"/>
+    <set-payload value="#[[1,2,3]]" doc:name="Set Payload" doc:id="e542ede7-c08b-48fb-9f5e-c94004794089"/>
+    <foreach doc:name="For Each" doc:id="a8a76540-16be-4fd6-b5b2-5193e5821c29">
+      <logger level="INFO" doc:name="Logger" doc:id="af3af9cf-93e1-4e5c-872a-558d8a1c8c79" message="#[payload]"/>
+    </foreach>
+    <logger level="INFO" doc:name="Logger" doc:id="b8132713-c200-4065-a60f-88ad4ba8f438" message="#[payload]"/>
+  </flow>
+
+  <flow name="sampleFlow15" doc:id="1f3ecf18-299c-4ff2-b2b1-dce27f0b04e4">
+    <http:listener doc:name="Listener1" doc:id="f2ecc29f-537a-47ae-95e8-4be11068c72e"
+      config-ref="HTTP_Listener_config1" path="/mule56"/>
+    <set-payload value="#[[1,2,3]]" doc:name="[1,2,3]" doc:id="6b2d79bf-4f0d-483d-9cde-e7acbfa54d14"/>
+    <foreach doc:name="For Each" doc:id="5f838ea0-a60e-470a-81ee-e533a21c0734">
+      <set-payload value='#["order" ++ payload]' doc:name='"order" ++ payload'
+        doc:id="d724a77e-4847-45e3-8023-be150f5cfc74"/>
+    </foreach>
+    <logger level="INFO" doc:name="Logger" doc:id="371727e5-dfd2-419c-bd1d-2f4054717baa" message="#[payload]"/>
+  </flow>
+
+  <flow name="sampleFlow16" doc:id="f25e3a59-b2f5-453d-9f36-d229e008db53">
+    <http:listener doc:name="Listener1" doc:id="b7074acc-e001-42d8-a1fb-f8cd618a0425"
+      config-ref="HTTP_Listener_config1" path="/mule54"/>
+    <set-payload value='#[{
+	"student" : {
+		"name" : "vishwas"
+	}
+}]' doc:name="json payload"
+      doc:id="32efb173-eed3-4937-91d4-148b0359d703"/>
+    <logger level="INFO" doc:name="Logger" doc:id="9423f6c9-e4d5-4e2b-a262-943879ea171d"
+      message="#[typeOf(payload)]"/>
+    <logger level="INFO" doc:name="Logger" doc:id="e5f380e0-3cdc-4dc6-bb79-16dcb27ec097"
+      message='The payload is #[payload]'/>
+  </flow>
+  <flow name="sampleFlow1" doc:id="f440174b-3faa-4ed1-a169-3f5d460589c2">
+    <http:listener doc:name="Listener1" doc:id="87f2a689-781d-4d75-891a-1b1bdc5f09eb"
+      config-ref="HTTP_Listener_config1" path="/mule4"/>
+    <set-variable value="#[attributes.queryParams.number]" doc:name="Set Variable"
+      doc:id="db7e199f-fae5-46fd-a28d-b52521d929e4" variableName="num"/>
+    <validation:is-number numberType="INTEGER" doc:name="Is number"
+      doc:id="c3e29731-26bf-481b-bbbf-f5ae74d71bd4" config-ref="Validation_Config" value="#[vars.num]"/>
+  </flow>
+
+  <flow name="sampleFlow18" doc:id="7bfa8290-67df-4cc4-bfe4-8beb9123da1f">
+    <http:listener doc:name="Listener1" doc:id="08f07cfe-a6a7-4107-a8c6-a81e445585d6"
+      config-ref="HTTP_Listener_config1" path="/mule57"/>
+    <set-variable value="#[attributes.queryParams.number]" doc:name="String"
+      doc:id="721b9612-f32c-4a25-876f-a10a6941d75b" variableName="num"/>
+    <validation:is-null doc:name="Is null" doc:id="c5670e5e-5bee-40f4-99b2-624575cadf85"
+      value="#[vars.num]"/>
+    <logger level="INFO" doc:name="Logger" doc:id="b724f351-40c7-4c75-8405-6b9b7c7d1ab2" message='#["RUNNINNG"]'/>
+  </flow>
+  <flow name="sampleFlow10" doc:id="125ca758-56a4-4513-bfcc-bdce7d5a89fd">
+    <http:listener doc:name="Copy_of_Listener1" doc:id="1a52f506-59ea-4640-86d5-afd53b1783a0"
+      config-ref="HTTP_Listener_config1" path="/mule49"/>
+    <set-payload doc:name="Set JSON Payload" doc:id="a0cd0c5e-0ed6-49c4-bede-6839302a9a39"
+      value='#[[
+		{
+			"orderId": 592,
+			"shipping": "international",
+			"quantity": 1,
+			"price": 20
+		},
+		{
+			"orderId": 972,
+			"shipping": "domestic",
+			"quantity": 2,
+			"price": 30
+		}
+	]]'/>
+    <logger level="INFO" doc:name="Logger" doc:id="626609d8-df22-4ea8-9034-ff184a6535a0"
+      message="#[typeOf(payload)]"/>
+    <ee:transform doc:name="Transform Message into XML" doc:id="3122f01f-1ab7-4cb2-b66e-2122b3df8499">
+      <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+---
+{
+	"order" : {( payload map(obj,index) -> {
+		item @(orderId:obj.orderId): {
+			shipping: obj.shipping,
+			total: obj.quantity * obj.price
+		}	
+	}
+  )}	
+}
+]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <logger level="INFO" doc:name="Logger" doc:id="947ec522-bf8e-4a54-98a4-084e54b3c74a"
+      message="#[typeOf(payload)]"/>
+    <logger level="INFO" doc:name="Logger" doc:id="2cde5f92-0639-4308-a9f3-9e8779d557c5" message="#[payload]"/>
+    <ee:transform doc:name="Transform Message" doc:id="1ef9e77a-917d-4fa4-bc47-5015da853408">
+      <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+	typeOf(payload)]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <logger level="INFO" doc:name="Logger" doc:id="a7bbcd90-0b77-461d-8725-ebcdaf6f1e97"
+      message="#[typeOf(payload)]"/>
+    <logger level="INFO" doc:name="Logger" doc:id="79e3898b-4e9d-46aa-9118-d5996105780a" message="#[payload]"/>
+  </flow>
+  <flow name="sampleFlow2" doc:id="4276c9bd-1793-4874-80b4-4dc1b97636ee">
+    <http:listener doc:name="Listener2" doc:id="49453837-c599-4bca-8df3-8b361dc45ce9"
+      config-ref="HTTP_Listener_config1" path="/mule41">
+    </http:listener>
+    <set-variable value="#[attributes.queryParams.number]" doc:name="Set Variable"
+      doc:id="a32d3c7c-5b81-47a7-9778-e1ae2e3b8d44" variableName="num"/>
+    <validation:is-number numberType="INTEGER" doc:name="Is number"
+      doc:id="76c2d03a-d7fe-43d1-8e61-c0dc5bbf8d6b" config-ref="Validation_Config" value="#[vars.num]"/>
+  </flow>
+
+  <flow name="sampleFlow3" doc:id="019af492-06ce-47a3-8d71-1e7f6fe693e4">
+    <http:listener doc:name="Copy_of_Listener2" doc:id="bb8887e8-e5e9-48c2-a312-7f368a0fc9ee"
+      config-ref="HTTP_Listener_config1" path="/mule42">
+      <http:error-response statusCode="#[vars.httpStatus default 500]">
+        <http:body><![CDATA[#[payload]]]></http:body>
+      </http:error-response>
+    </http:listener>
+    <set-variable value="#[attributes.queryParams.number]" doc:name="Copy_of_Set Variable"
+      doc:id="103715d2-6145-4275-9dcf-5aa5148c2b89" variableName="num"/>
+    <try doc:name="Try" doc:id="9d92012d-4b63-4c5e-9e33-c653813afbf9">
+      <validation:is-number numberType="INTEGER" doc:name="Copy_of_Is number"
+        doc:id="e6bddfb5-cff7-41ae-83a0-bb105ec24be7" config-ref="Validation_Config" value="#[vars.num]"/>
+			<error-handler>
+        <on-error-propagate enableNotifications="true" logException="true"
+          doc:name="On Error Propagate" doc:id="33aab851-35f7-4d84-a5c4-b8beb146e01b">
+          <ee:transform doc:name="Copy_of_Transform Message" doc:id="4c56af05-f559-4537-9431-7bf5b9e10b78">
+            <ee:message>
+              <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"errTryCustom" : error.description ++ " VISHWAS"
+}
+]]></ee:set-payload>
+            </ee:message>
+          </ee:transform>
+        </on-error-propagate>
+      </error-handler>
+    </try>
+    <logger level="INFO" doc:name="Logger" doc:id="251cb806-c1ab-43bd-a5f3-045f1d061e73" />
+		<error-handler>
+      <on-error-propagate enableNotifications="true" logException="true"
+        doc:name="On Error Propagate" doc:id="527d6ee1-a4c6-4de3-923f-60cbebbe712c" type="VALIDATION:INVALID_NUMBER">
+        <ee:transform doc:name="Transform Message" doc:id="e8af9053-2fb2-4098-a0a9-79d4d1f7f5c2">
+          <ee:message>
+            <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"errCustom" : error.description ++ " VISHWAS"
+}
+]]></ee:set-payload>
+          </ee:message>
+        </ee:transform>
+        <set-variable value="501" doc:name="Set Variable" doc:id="055e1961-b7a4-4df6-8273-bc3b3439a496"
+          variableName="httpStatus"/>
+      </on-error-propagate>
+      <on-error-propagate enableNotifications="true" logException="true"
+        doc:name="On Error Propagate" doc:id="4085a434-dc19-433b-9de7-102c2f3482b7" type="ANY">
+        <ee:transform doc:name="Copy_of_Transform Message" doc:id="98d86eb5-6e6e-4f8d-ade3-b0f34cbf1e83">
+          <ee:message>
+            <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"errAny" : error.description ++ " VISHWAS"
+}
+]]></ee:set-payload>
+          </ee:message>
+        </ee:transform>
+        <set-variable value="504" doc:name="Copy_of_Set Variable"
+          doc:id="b125cf53-3a88-4c7b-b37a-2373f878fbc6" variableName="httpStatus"/>
+      </on-error-propagate>
+    </error-handler>
+  </flow>
+
+  <flow name="sampleFlow11" doc:id="28de5877-c71c-4206-b6ae-ab8c5fb94309">
+    <http:listener doc:name="Copy_of_Listener2" doc:id="5a54f10a-7234-4bdf-ac93-eaf6292a4eff"
+      config-ref="HTTP_Listener_config1" path="/mule50">
+      <http:error-response statusCode="#[vars.httpStatus default 500]">
+        <http:body><![CDATA[#[payload]]]></http:body>
+      </http:error-response>
+    </http:listener>
+    <set-variable value="#[attributes.queryParams.number]" doc:name="Copy_of_Set Variable"
+      doc:id="cd77ed39-c86f-48db-8797-a6238f8a86b6" variableName="num"/>
+    <try doc:name="Try" doc:id="abca53c1-9a1c-46e9-a297-0962705e54fb">
+      <validation:is-number numberType="INTEGER" doc:name="Copy_of_Is number"
+        doc:id="02493d4d-9767-4d67-ab60-d09213641ec4" config-ref="Validation_Config" value="#[vars.num]"/>
+      <error-handler>
+        <on-error-propagate enableNotifications="true" logException="true"
+          doc:name="On Error Propagate" doc:id="e156028d-61d6-4555-a6d9-7cc1f75c054d">
+          <set-payload value='#["Error Try Scope"]' doc:name='"Error Try Scope"'
+            doc:id="17340495-4b8b-42a2-bfb1-6cbea606d7aa"/>
+        </on-error-propagate>
+      </error-handler>
+    </try>
+    <set-payload value='#["Success Main Flow"]' doc:name='"Success Main Flow"'
+      doc:id="6b5c9c0f-bbe5-4091-8302-d185a1ca8717"/>
+    <error-handler>
+      <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue"
+        doc:id="c3f5a3df-be5e-4ed6-89c7-591008e3cf26" type="ANY">
+        <set-payload value='#["Error Main Flow"]' doc:name='"Error Main Flow"'
+          doc:id="01b29429-a852-4257-b5ec-5f6db33d26ba"/>
+      </on-error-continue>
+    </error-handler>
+  </flow>
+
+  <flow name="sampleFlow12" doc:id="d15d65ae-ad5d-45e7-8e10-345c119777cb">
+    <http:listener doc:name="Copy_of_Listener2" doc:id="29fd5a2c-5ffb-4f0a-8fd0-7fccb3986d48"
+      config-ref="HTTP_Listener_config1" path="/mule51">
+      <http:error-response statusCode="#[vars.httpStatus default 500]">
+        <http:body><![CDATA[#[payload]]]></http:body>
+      </http:error-response>
+    </http:listener>
+    <set-variable value="#[attributes.queryParams.number]" doc:name="Copy_of_Set Variable"
+      doc:id="88a3c03b-54d0-4289-a011-2e96470f2702" variableName="num"/>
+    <try doc:name="Try" doc:id="6ac1f059-b8c8-4edf-b52d-ee71cc8d8656">
+      <validation:is-number numberType="INTEGER" doc:name="Copy_of_Is number"
+        doc:id="69da42f6-0e8e-48f0-ae06-2381ec81dfc3" config-ref="Validation_Config" value="#[vars.num]"/>
+      <error-handler>
+        <on-error-propagate enableNotifications="true" logException="true"
+          doc:name="On Error Propagate" doc:id="d301d7ac-f2e0-4d5c-9a19-5feada6e2e15">
+          <set-payload value='#["Error Try Scope"]' doc:name='"Error Try Scope"'
+            doc:id="8cad99a5-ff69-460b-82b5-f47954c455d0"/>
+        </on-error-propagate>
+      </error-handler>
+    </try>
+    <set-payload value='#["Success Main Flow"]' doc:name='"Success Main Flow"'
+      doc:id="70277672-d8ac-4f79-9b30-6a5fb9bb3cd9"/>
+  </flow>
+
+  <flow name="sampleFlow13" doc:id="bcacd001-9306-4532-99c1-14fb5e5063af">
+    <http:listener doc:name="Listener13" doc:id="6c71b88b-cb83-4a24-b83c-f1d1647e2366"
+      config-ref="HTTP_Listener_config1" path="/mule52">
+      <http:error-response statusCode="#[vars.httpStatus default 500]">
+        <http:body><![CDATA[#[payload]]]></http:body>
+      </http:error-response>
+    </http:listener>
+    <set-variable value="#[attributes.queryParams.number]" doc:name="Set Variable"
+      doc:id="b877b21a-27e3-4089-a78f-1c32ef723501" variableName="num"/>
+    <flow-ref doc:name="privateFlow1" doc:id="c668e3d3-32bb-4d67-ba98-1655f809e6bc" name="privateFlow1"/>
+    <set-payload value='#["Success Main Flow"]' doc:name='"Success Main Flow"'
+      doc:id="c2a927cd-a9b4-461c-a1f6-2313eb6ff586"/>
+    <error-handler>
+      <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue"
+        doc:id="58b6d055-e679-49e1-a28b-3cec80f5d131" type="ANY">
+        <set-payload value='#["Error Main Flow"]' doc:name='"Error Main Flow"'
+          doc:id="47b57431-0664-46a1-9d00-c63841255e89"/>
+      </on-error-continue>
+    </error-handler>
+  </flow>
+
+  <flow name="privateFlow1" doc:id="74e0f625-512d-4bea-9e0d-63be4309d10f">
+    <try doc:name="Try" doc:id="fab5d0e1-2fac-445d-bd85-bcd68167fc13">
+      <validation:is-number numberType="INTEGER" doc:name="Is number"
+        doc:id="48066d5a-1810-4897-a7e0-2508af60e468" config-ref="Validation_Config" value="#[vars.num]"/>
+      <error-handler>
+        <on-error-continue enableNotifications="true" logException="true" doc:name="Error Continue"
+          doc:id="cd57b900-bcef-4ace-a334-c9dbbe3710c0">
+          <set-payload value='#["Error Private Flow"]' doc:name='"Error Private Flow"'
+            doc:id="2b042502-3e6e-49de-9d51-3b56c06faee3"/>
+        </on-error-continue>
+      </error-handler>
+    </try>
+  </flow>
+  <flow name="sampleFlow14" doc:id="34c5436c-aa09-4b74-8252-49a4ff8ff703">
+    <http:listener doc:name="Copy_of_Listener13" doc:id="f9e63f0a-d877-443d-a08f-fe600fcfa1ff"
+      config-ref="HTTP_Listener_config1" path="/mule53">
+      <http:error-response statusCode="#[vars.httpStatus default 500]">
+        <http:body><![CDATA[#[payload]]]></http:body>
+      </http:error-response>
+    </http:listener>
+    <scatter-gather doc:name="Scatter-Gather" doc:id="57cceb5a-d705-448a-a981-ba95a1b39ad4">
+      <route>
+        <flow-ref doc:name="setPayload1" doc:id="c799de80-9cbf-44bb-a644-58e509f963f8" name="setPayload1"/>
+      </route>
+      <route>
+        <flow-ref doc:name="setPayload2" doc:id="67fac0c9-31cd-4ced-ac4b-abcc424bcf12" name="setPayload2"/>
+      </route>
+    </scatter-gather>
+    <ee:transform doc:name="Transform Message" doc:id="32fa3fe8-3047-4484-b30a-a6d9fe8b8d11">
+      <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+---
+payload]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <logger level="INFO" doc:name="Logger" doc:id="53832d25-73fc-42ed-94e8-4fd442c5c7b6" message="#[payload]"/>
+  </flow>
+  <flow name="setPayload1" doc:id="d4ed864b-a4e2-4419-a7d5-5a1ecd832bb3">
+    <set-payload value='#["100"]' doc:name='"100"' doc:id="a65a44ed-9d31-448f-8c3d-0baf92747713"/>
+  </flow>
+  <flow name="setPayload2" doc:id="b318649d-aa6a-483b-a4ea-8b57ed98e160">
+    <set-payload value='#["200"]' doc:name='"200"' doc:id="d2cc6f71-8f08-4346-81d4-d0df640598fd"/>
+  </flow>
+  <flow name="sampleFlow4" doc:id="abc326e0-ae84-44bb-9ada-a2ed31b5651b">
+    <http:listener doc:name="Listener2" doc:id="4d4c8da3-b384-43d6-9a74-543e8ac93dcb"
+      config-ref="HTTP_Listener_config1" path="/mule43">
+    </http:listener>
+    <set-variable value="#[attributes.queryParams.number]" doc:name="Set Variable"
+      doc:id="2e451767-5dc5-4f6e-85ac-3418ecc85405" variableName="num"/>
+    <set-payload value='#["Success - begin main flow"]' doc:name='"Success - begin main flow"'
+      doc:id="696bb556-c767-4ad1-a2d3-988a6ffcaa8c"/>
+    <validation:is-number numberType="INTEGER" doc:name="Is number"
+      doc:id="cb5aa002-3d21-40fd-af9d-0db60f42efdb" config-ref="Validation_Config" value="#[vars.num]"/>
+    <set-payload value='#["Success - end main flow"]' doc:name='"Success - end main flow"'
+      doc:id="4448aec5-d311-4e88-97e8-02f50b55d91d"/>
+    <error-handler>
+      <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue"
+        doc:id="29b0f029-7e84-401d-b501-19978ebad11f">
+        <set-payload value='#["Error - main flow"]' doc:name='"Error - main flow"'
+          doc:id="8f27f8bd-d609-4178-bde4-04fc3b1ac1cd"/>
+      </on-error-continue>
+    </error-handler>
+  </flow>
+
+  <flow name="sampleFlow5" doc:id="93c29cb8-ce8c-44af-8324-f34fd2b9abe0">
+    <http:listener doc:name="Listener2" doc:id="1e9312d0-e3c4-4bac-85cb-020dbcc4355c"
+      config-ref="HTTP_Listener_config1" path="/mule44">
+    </http:listener>
+    <set-variable value="#[attributes.queryParams.number]" doc:name="Set Variable"
+      doc:id="9a8dc3a3-b9c8-4234-8743-d3b069106a57" variableName="num"/>
+    <set-payload value='#["Success - begin main flow"]' doc:name='"Success - begin main flow"'
+      doc:id="ce2f87da-425e-4eab-9cd3-931e4c70fc38"/>
+    <validation:is-number numberType="INTEGER" doc:name="Is number"
+      doc:id="d5eb5d60-d305-477b-8af1-07b6c3a13d31" config-ref="Validation_Config" value="#[vars.num]"/>
+    <set-payload value='#["Success - end main flow"]' doc:name='"Success - end main flow"'
+      doc:id="0406e967-dfd1-4a95-8d9f-a48f9561668b"/>
+    <error-handler>
+      <on-error-propagate enableNotifications="true" logException="true"
+        doc:name="On Error Propogate" doc:id="af9f11fa-c427-4f71-9417-05150b863d97">
+        <set-payload value='#["Error - main flow"]' doc:name='"Error - main flow"'
+          doc:id="c8d462d2-9a7f-47ef-b9d0-0b0f775591c6"/>
+      </on-error-propagate>
+    </error-handler>
+  </flow>
+  <error-handler name="globalErrHandler" doc:id="4fcbb93d-ce70-44bb-8d04-b5add3c31564">
+    <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue"
+      doc:id="4e854a95-8fad-4ebd-a567-4f3d67bf2a26" type="ANY">
+      <set-payload value='#["Global - error handler"]' doc:name="Set Payload"
+        doc:id="b24fa777-d70c-4a40-8730-564177eb9b93"/>
+    </on-error-continue>
+    <!-- <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="4079644a-f088-4388-a930-01754948e788" type="ANY">
+      <ee:transform doc:name="Copy_of_Transform Message" doc:id="63b6f3f5-674b-4a33-bd50-1e7593f7231d" >
+        <ee:message >
+          <ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+-&#45;&#45;
+{
+	"errPropogate" : error.description
+}
+
+]]></ee:set-payload>
+        </ee:message>
+      </ee:transform>
+    </on-error-propagate> -->
+  </error-handler>
+  <flow name="sampleFlow19" doc:id="cb160d35-e597-42ac-bae6-f7a6c69f2137">
+    <http:listener doc:name="Copy_of_Listener" doc:id="d1ebb50f-60a7-4fc0-a1f8-d757339b6893"
+      config-ref="HTTP_Listener_config1" path="/mule59"/>
+    <set-payload value='#[{
+	company : "Mulesoft"
+}]' doc:name='{ company : "Mulesoft" }'
+      doc:id="c1e6bd96-9104-4813-a12a-7dd50cc20a73"/>
+    <choice doc:name="Choice" doc:id="d2c5dd04-8143-4882-a502-0d842665c1cd">
+      <when expression="#['Mulesoft' == payload.company]">
+        <logger level="INFO" doc:name="Logger" doc:id="24bcfbb6-e9b7-47c7-9386-91830efba143" message='#["WHEN"]'/>
+      </when>
+      <otherwise>
+        <logger level="INFO" doc:name="Logger" doc:id="60c262d1-9da4-4642-ab4c-e18899938f44"
+          message='#["DEFAULT"]'/>
+      </otherwise>
+    </choice>
+  </flow>
+  <flow name="sampleFlow20" doc:id="e1adb63b-5421-41b9-882a-361b9672f38e">
+    <http:listener doc:name="Copy_of_Copy_of_Listener" doc:id="9f9a9da3-21fc-4071-aa4e-e27eb6aa11b7"
+      config-ref="HTTP_Listener_config1" path="/mule60"/>
+    <set-payload value='#["REGION"]' doc:name="Set Payload" doc:id="e8a864e5-d5f0-4c53-886e-c722353d42a6"/>
+    <logger level="INFO" doc:name="Logger" doc:id="77cb278f-7275-429b-999c-bb07fd13fe7d"
+      message="#[not isEmpty(payload)]"/>
+    <choice doc:name="Choice" doc:id="a80dbb88-20d7-4a66-a559-b0985de527fc">
+      <when expression="#[not isEmpty(payload)]">
+        <logger level="INFO" doc:name="Logger" doc:id="09323b23-0af1-4228-b40b-96911feaa6c3" message='#["WHEN"]'/>
+      </when>
+      <otherwise>
+        <logger level="INFO" doc:name="Logger" doc:id="316b40d1-cb81-449f-9c37-7084f6b4aeaa"
+          message='#["DEFAULT"]'/>
+      </otherwise>
+    </choice>
+  </flow>
+  <flow name="sampleFlow21" doc:id="c31fc7a8-a494-4635-aaef-1880630ecf0c">
+    <http:listener doc:name="Copy_of_Copy_of_Copy_of_Listener"
+      doc:id="4697f1e2-e633-46bb-98be-9f3306d5c8d8" config-ref="HTTP_Listener_config1" path="/mule61"/>
+    <logger level="INFO" doc:name="Logger" doc:id="1ceffe68-8006-4862-b497-c1b4b2b6adda" message="#[payload]"/>
+    <ee:transform doc:name="Transform Message" doc:id="10cc11de-a9ee-4b2a-8606-6f6811ef57e7">
+      <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	vendor : "Acme" 
+}
+
+++ payload.sale]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <logger level="INFO" doc:name="Logger" doc:id="eeecdeb7-0ca1-45cf-b7b0-58b8fcb66c61" message="#[payload]"/>
+		<file:write doc:name="Write" doc:id="8139f006-ad3d-469d-acb3-288359e3f447" config-ref="File_Config" path="C:\Users\vishwas.s\AnypointStudio\workspace1\sample\src\main\resources\sample3.csv">
+			<file:content ><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	vendor : "Acme" 
+}
+
+++ payload.sale]]]></file:content>
+		</file:write>
+  </flow>
+  <flow name="sampleFlow22" doc:id="7ef83df9-cfe7-4522-b5e9-b9bc81f0fc25">
+    <http:listener doc:name="Copy_of_Copy_of_Copy_of_Copy_of_Listener"
+      doc:id="4c4bbcd9-96df-4007-8642-063ace8c639d" config-ref="HTTP_Listener_config1" path="/mule62"/>
+    <set-payload value="&lt;note&gt;&lt;to&gt;Tove&lt;/to&gt;&lt;/note&gt;" doc:name="Set Payload"
+      doc:id="ccb50ee9-1bff-461a-ae80-ddc700cf7765"/>
+    <ee:transform doc:name="Transform Message" doc:id="4b0ac0b7-37ab-453a-9c39-fb2b1176dcc8">
+      <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+fun newProdCode(itemID: Number, productCategory: String) = "PC-" ++ productCategory ++
+(itemID as String)
+---
+{
+	"a" : typeOf(payload),
+	"b" : newProdCode(1,"vishwas")
+}]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+  </flow>
+  <flow name="sampleFlow23" doc:id="0d5df863-4a9b-4801-9fe7-6b0927ad9f1c">
+    <http:listener doc:name="Copy_of_Copy_of_Copy_of_Copy_of_Copy_of_Listener"
+      doc:id="193051d0-9532-4b96-8dd8-338d48243572" config-ref="HTTP_Listener_config1" path="/mule63"/>
+    <set-payload value="#[{'year' : '2020'}]" doc:name="{'year' : '2020'}"
+      doc:id="10971ca0-23a2-42af-b3d8-19e751d1f03b"/>
+    <logger level="INFO" doc:name="Logger" doc:id="9b7c06c3-8b6c-4368-b636-59c7f3d75c86"
+      message='#["The year is" ++ payload.year]'/>
+  </flow>
+</mule>
